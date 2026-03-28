@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="z1/z1.csproj" />
+  <Project Path="z2/z2.csproj" Id="32f775c9-f3c0-4d5c-a479-0efb29eb3556" />
+  <Project Path="z3/z3.csproj" Id="988d3fc5-daac-4adf-913b-90246c73ae1c" />
+</Solution>
