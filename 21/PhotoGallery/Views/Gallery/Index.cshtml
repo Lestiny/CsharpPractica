@@ -1,0 +1,84 @@
+@model PhotoGallery.Models.GalleryIndexViewModel
+
+@{
+    ViewData["Title"] = "Галерея";
+}
+
+<div class="row g-4">
+    <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Добавить изображение (URL)</h5>
+
+                <form asp-action="Add" method="post" class="vstack gap-3">
+                    @Html.AntiForgeryToken()
+
+                    <div>
+                        <label class="form-label" asp-for="Input.Title"></label>
+                        <input class="form-control" asp-for="Input.Title" />
+                        <span class="text-danger" asp-validation-for="Input.Title"></span>
+                    </div>
+
+                    <div>
+                        <label class="form-label" asp-for="Input.Url"></label>
+                        <input class="form-control" asp-for="Input.Url" placeholder="https://example.com/image.jpg" />
+                        <span class="text-danger" asp-validation-for="Input.Url"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 m-0">Сетка изображений</h2>
+            <div class="text-muted small">Всего: @Model.Photos.Count</div>
+        </div>
+
+        @if (Model.Photos.Count == 0)
+        {
+            <div class="alert alert-secondary">Пока нет изображений. Добавьте первое по URL.</div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                @foreach (var p in Model.Photos)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <a href="@Url.Action("Show", "Gallery", new { id = p.Id })" class="text-decoration-none">
+                                <img src="@p.Url" class="card-img-top" alt="@p.Title" style="aspect-ratio: 4 / 3; object-fit: cover;" loading="lazy" />
+                            </a>
+                            <div class="card-body">
+                                <div class="fw-semibold text-truncate" title="@p.Title">@p.Title</div>
+                                <div class="text-muted small">@p.DateUploaded.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <div class="d-grid gap-2">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="@Url.Action("Show", "Gallery", new { id = p.Id })">
+                                        Открыть
+                                    </a>
+
+                                    <form asp-action="Delete" method="post"
+                                          onsubmit="return confirm('Удалить изображение?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">Удалить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

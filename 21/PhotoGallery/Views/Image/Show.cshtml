@@ -1,0 +1,39 @@
+@model PhotoGallery.Models.Photo
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">@Model.Title</h1>
+        <div class="text-muted">Загружено: @Model.DateUploaded.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-action="Delete" method="post" onsubmit="return confirm('Удалить изображение?');" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-danger">Удалить</button>
+        </form>
+        <a class="btn btn-outline-secondary" asp-controller="Image" asp-action="Index">Назад</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <img src="@Model.Url" class="card-img-top" alt="@Model.Title" style="max-height: 70vh; object-fit: contain; background: #f8f9fa;" />
+    <div class="card-body">
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="mb-3">
+                <div class="fw-semibold">Описание</div>
+                <div class="text-muted" style="white-space: pre-wrap">@Model.Description</div>
+            </div>
+        }
+
+        <div class="mb-2">
+            <div class="fw-semibold">URL</div>
+            <a href="@Model.Url" target="_blank" rel="noreferrer">@Model.Url</a>
+        </div>
+    </div>
+</div>
+
