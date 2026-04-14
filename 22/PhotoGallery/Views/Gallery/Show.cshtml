@@ -1,0 +1,79 @@
+@model PhotoGallery.Models.ImageItem
+
+@{
+    var displayTitle = string.IsNullOrWhiteSpace(Model.Title) ? "Без названия" : Model.Title;
+    ViewData["Title"] = displayTitle;
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">@displayTitle</h1>
+        <div class="text-muted">Загружено: @Model.UploadedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-action="Delete" method="post" onsubmit="return confirm('Удалить изображение?');" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-danger">Удалить</button>
+        </form>
+        <a class="btn btn-outline-secondary" asp-controller="Gallery" asp-action="Index">Назад к галерее</a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <img src="@Model.Path" class="card-img-top" alt="@displayTitle" style="max-height: 70vh; object-fit: contain; background: #f8f9fa;" />
+    <div class="card-body">
+        <div class="mb-2">
+            <div class="fw-semibold">Путь</div>
+            <span class="text-muted">@Model.Path</span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="mb-3">
+                <div class="fw-semibold">Описание</div>
+                <div class="text-muted" style="white-space: pre-wrap">@Model.Description</div>
+            </div>
+        }
+        <form asp-action="EditTitle" method="post" class="vstack gap-2">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <label class="form-label mb-0">Изменить заголовок</label>
+            <input id="titleInput" type="text" name="title" value="@Model.Title" maxlength="80" class="form-control" />
+            <button id="saveTitleButton" type="submit" class="btn btn-primary d-none">Сохранить</button>
+        </form>
+        <form asp-action="ClearTitle" method="post" class="mt-2">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button id="clearTitleButton" type="submit" class="btn btn-outline-secondary @(string.IsNullOrWhiteSpace(Model.Title) ? "d-none" : "")">
+                Удалить заголовок
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const titleInput = document.getElementById("titleInput");
+            const saveButton = document.getElementById("saveTitleButton");
+            const clearButton = document.getElementById("clearTitleButton");
+
+            if (!titleInput || !saveButton || !clearButton) {
+                return;
+            }
+
+            const initialValue = titleInput.value.trim();
+
+            const updateSaveVisibility = function () {
+                const currentValue = titleInput.value.trim();
+                const isChanged = currentValue.length > 0 && currentValue !== initialValue;
+                saveButton.classList.toggle("d-none", !isChanged);
+                clearButton.classList.toggle("d-none", currentValue.length === 0);
+            };
+
+            titleInput.addEventListener("input", updateSaveVisibility);
+            updateSaveVisibility();
+        })();
+    </script>
+}
+
